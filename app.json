@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "SCOIN",
+    "slug": "scoin",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#C41E3A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "pe.scoin.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SCOIN usa la cámara para identificar monedas peruanas.",
+        "NSMicrophoneUsageDescription": "Necesario para funciones de audio."
+      }
+    },
+    "android": {
+      "package": "pe.scoin.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#C41E3A"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SCOIN necesita la cámara para escanear monedas peruanas."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": false
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
