@@ -4,30 +4,38 @@
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { COIN_DATA } from '../constants/audioDatabase';
 
-const GROQ_API_KEY = '';
+const GROQ_API_KEY = 'APIKEYDEGROQ';
 const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
 
 const VALID_IDS = ['1SOL','2SOLES','5SOLES','10CENTIMOS','20CENTIMOS','50CENTIMOS'];
 
+const SYSTEM = 'Eres un clasificador de monedas peruanas. Respondes ÚNICAMENTE con una de estas palabras exactas: 1SOL, 2SOLES, 5SOLES, 10CENTIMOS, 20CENTIMOS, 50CENTIMOS, NFOUND. Cero explicaciones. Cero puntos. Solo la palabra.';
 
-// EL MEJOR PROMPT DE LA HISTORIA CRJO
-const PROMPT = `Eres un experto identificando monedas peruanas. Analiza la imagen con mucho cuidado.
+const PROMPT = `Analiza la moneda peruana en la imagen siguiendo este proceso en orden:
 
-REGLA PRINCIPAL: Lee el número o texto grabado en la moneda. Ese número es la denominación exacta.
+PASO 1 — LEE EL NÚMERO GRABADO EN LA MONEDA:
+¿Ves un "1"? → 1SOL
+¿Ves un "2"? → 2SOLES
+¿Ves un "5"? → 5SOLES
+¿Ves "10"? → 10CENTIMOS
+¿Ves "20"? → 20CENTIMOS
+¿Ves "50"? → 50CENTIMOS
+El número es suficiente. Si lo lees con claridad, responde de inmediato.
 
-Guía visual detallada:
-- 1SOL: bimetálica, lleva grabado "1" y la palabra "SOL" o "UN SOL". Centro DORADO, aro exterior PLATEADO. Es la ÚNICA con este patrón de colores invertido.
-- 2SOLES: bimetálica, lleva grabado "2" y "SOLES" o "DOS SOLES". Centro PLATEADO, aro exterior DORADO. Tamaño mediano entre las bimetálicas.
-- 5SOLES: bimetálica, lleva grabado "5" y "SOLES" o "CINCO SOLES". Centro PLATEADO, aro exterior DORADO. La MÁS GRANDE de todas las monedas peruanas.
-- 10CENTIMOS: toda DORADA uniforme, lleva grabado "10" y "CÉNTIMOS". La más pequeña de todas.
-- 20CENTIMOS: toda DORADA uniforme, lleva grabado "20" y "CÉNTIMOS". Tamaño mediano entre céntimos.
-- 50CENTIMOS: toda DORADA uniforme, lleva grabado "50" y "CÉNTIMOS". La más grande entre los céntimos.
-- NFOUND: imagen borrosa, no es moneda peruana, o no se puede leer el número con certeza.
+PASO 2 — Si el número no es legible, evalúa los colores:
+¿Tiene DOS colores (bimetálica)?
+  → Centro DORADO + aro PLATEADO = 1SOL (única con este patrón)
+  → Centro PLATEADO + aro DORADO = puede ser 2SOLES o 5SOLES
+    → Si es la moneda más grande de las dos = 5SOLES
+    → Si es más pequeña = 2SOLES
+¿Tiene UN solo color dorado uniforme?
+  → La más pequeña de todas = 10CENTIMOS
+  → Mediana = 20CENTIMOS
+  → La más grande entre las doradas = 50CENTIMOS
 
-IMPORTANTE: Si ves el número "2" grabado → es 2SOLES. Si ves "5" grabado → es 5SOLES. Si ves "1" → es 1SOL. El número grabado tiene prioridad sobre cualquier otra característica visual.
+PASO 3 — Si la imagen es borrosa o no es moneda peruana → NFOUND
 
-Responde SOLO el código exacto, una palabra:
-1SOL | 2SOLES | 5SOLES | 10CENTIMOS | 20CENTIMOS | 50CENTIMOS | NFOUND`;
+Responde con una sola palabra:`;
 
 export const identifyCoin = async (imageUri) => {
   try {
@@ -50,6 +58,10 @@ export const identifyCoin = async (imageUri) => {
         max_tokens: 20,
         temperature: 0,
         messages: [
+          {
+            role: 'system',
+            content: SYSTEM,
+          },
           {
             role: 'user',
             content: [

@@ -1,5 +1,5 @@
 import { Audio } from 'expo-av';
-import { AUDIO_ASSETS, COIN_TO_AUDIO } from '../constants/audioatabase';
+import { AUDIO_ASSETS, COIN_TO_AUDIO } from '../constants/audioDatabase';
 
 let _sound = null;
 
